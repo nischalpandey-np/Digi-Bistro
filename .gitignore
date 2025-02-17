@@ -1,1 +1,3 @@
-.env/
+rm .env  # Delete the .env file
+echo ".env" >> .gitignore  # Ensure it's ignored in the future
+git add .gitignore
