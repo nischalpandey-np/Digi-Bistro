@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order</title>
+    <link rel="stylesheet" href="/static/styles1.css">
+</head>
+<body>
+    <section id="order" class="order-form-section">
+        <div id="order-form" class="order-form-container">
+            <h2>Order Form</h2>
+            <form id="order-form-content" action="/order.html" method="post">
+                <div class="form-field">
+                    <label for="customer-name">Customer Name</label>
+                    <input type="text" id="customer-name" name="customer-name" required>
+                </div>
+                <div class="form-field">
+                    <label for="phone-number">Phone Number</label>
+                    <input type="tel" id="phone-number" name="phone-number" required>
+                </div>
+                <div class="form-field">
+                    <label for="items">Items</label>
+                    <input type="text" id="items" name="items" readonly>
+                </div>
+                <button type="submit" class="cta">Place Order</button>
+            </form>
+        </div>
+    </section>
+    
+    <script src="/static/script.js"></script>
+</body>
+</html>
