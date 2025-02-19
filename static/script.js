@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (correspondingInput.disabled) {
                 correspondingInput.disabled = false;
                   correspondingInput.value = 1; // Start with quantity 1 when added to cart
-                this.textContent = 'Remove from Cart';
+                this.textContent = 'Remove Item from cart';
             } else {
                 correspondingInput.disabled = true;
                 correspondingInput.value = 0;

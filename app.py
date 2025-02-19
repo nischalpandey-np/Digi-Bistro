@@ -1,9 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
-import datetime
-import mysql.connector
-import os
 import logging
+from database import save_order_to_db
 from dotenv import load_dotenv
+import os
 
 # Load environment variables from .env file
 load_dotenv()
@@ -14,14 +13,6 @@ app.secret_key = os.getenv('SECRET_KEY')  # Required for flash messages and CSRF
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-# Define MySQL connection parameters using environment variables
-DB_CONFIG = {
-    "host": os.getenv('DB_HOST', 'localhost'),
-    "user": os.getenv('DB_USER', 'root'),
-    "password": os.getenv('DB_PASSWORD', ''),
-    "database": os.getenv('DB_NAME', 'gourmetBistro_db')
-}
 
 # Define item prices
 ITEM_PRICES = {
@@ -41,16 +32,6 @@ def format_currency(value):
 @app.template_filter('format_currency')
 def format_currency_filter(value):
     return format_currency(value)
-
-# Utility function to connect to the database
-def get_db_connection():
-    try:
-        conn = mysql.connector.connect(**DB_CONFIG)
-        return conn
-    except mysql.connector.Error as err:
-        logger.error(f"Database connection error: {err}")
-        flash("Database connection error. Please try again later.", "error")
-        return None
 
 @app.route('/')
 def index():
@@ -117,62 +98,13 @@ def order():
             return redirect(url_for('order'))
 
         # Save order to the database
-        conn = get_db_connection()
-        if not conn:
+        order_id = save_order_to_db(customer_name, phone_number, total_price, order_details)
+        if not order_id:
+            flash("An error occurred while saving your order. Please try again.", "error")
             return redirect(url_for('order'))
 
-        cursor = conn.cursor()
-        try:
-            # Create tables if they don't exist
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS orders (
-                    order_id INT AUTO_INCREMENT PRIMARY KEY,
-                    customer_name VARCHAR(255),
-                    phone_number VARCHAR(15),
-                    order_date DATETIME,
-                    total_price DECIMAL(10,2)
-                )
-            ''')
-
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS order_items (
-                    item_id INT AUTO_INCREMENT PRIMARY KEY,
-                    order_id INT,
-                    item_name VARCHAR(255),
-                    quantity INT,
-                    item_total DECIMAL(10,2),
-                    FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE
-                )
-            ''')
-
-            # Insert order into `orders` table
-            order_date = datetime.datetime.now()
-            cursor.execute('''
-                INSERT INTO orders (customer_name,  phone_number, order_date, total_price)
-                VALUES (%s, %s, %s, %s)
-            ''', (customer_name, phone_number, order_date, total_price))
-
-            order_id = cursor.lastrowid  # Get the last inserted order ID
-
-            # Insert items into `order_items` table
-            for item, details in order_details.items():
-                cursor.execute('''
-                    INSERT INTO order_items (order_id, item_name, quantity, item_total)
-                    VALUES (%s, %s, %s, %s)
-                ''', (order_id, item, details["quantity"], details["item_total"]))
-
-            # Commit changes
-            conn.commit()
-            logger.info(f"Order saved successfully for customer: {customer_name}")
-            flash("Your order has been placed successfully!", "success")
-
-        except mysql.connector.Error as err:
-            logger.error(f"Database error: {err}")
-            conn.rollback()
-            flash("An error occurred while saving your order. Please try again.", "error")
-        finally:
-            cursor.close()
-            conn.close()
+        logger.info(f"Order saved successfully for customer: {customer_name}")
+        flash("Your order has been placed successfully!", "success")
 
         return render_template('order_summary.html',
                               customer_name=customer_name,
@@ -184,4 +116,4 @@ def order():
     return render_template('order.html')
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    app.run(debug=False)

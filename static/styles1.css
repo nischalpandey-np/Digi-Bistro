@@ -76,7 +76,7 @@ header nav ul li a.cta:hover {
     padding: 6rem 2rem; /* Increased padding for larger banner */
     text-align: center;
     position: relative;
-    transition: background 0.5s ease;
+
 }
 
 .hero-content {
