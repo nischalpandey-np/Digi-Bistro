@@ -1,31 +1,5 @@
-# Ignore environment variables and secrets
-.env
-*.env
-
-# Ignore compiled Python files
 __pycache__/
-*.py[cod]
-
-# Ignore virtual environments
-venv/
-env/
-*.venv/
-
-# Ignore database files (if using SQLite)
-*.sqlite3
-*.db
-
-# Ignore logs
-logs/
-*.log
-
-# Ignore IDE and editor-specific files
-.vscode/
-.idea/
-*.swp
-*.swo
-.DS_Store
-
-# Ignore deployment files (optional)
+*.pyc
+.env
 instance/
-config.py
+*.db

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Gourmet Bistro</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="hero">
+        <div class="hero-content">
+            <div class="form-container">
+                <h1 class="neon">Welcome Back!</h1>
+                
+                <form action="{{ url_for('auth.login') }}" method="POST">
+                    <div class="form-group">
+                        <input type="text" name="username" placeholder=" " required>
+                        <label for="username">Username</label>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" name="password" placeholder=" " required>
+                        <label for="password">Password</label>
+                    </div>
+                    <button type="submit" class="cta">Login</button>
+                    
+                    <!-- Show flash messages -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            <div class="flash-messages">
+                                {% for category, message in messages %}
+                                    <div class="flash-message {{ category }}">{{ message }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+                </form>
+                
+                <p>New here? <a href="{{ url_for('auth.register_page') }}" class="hover-text-effect">Create an account</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add JavaScript if necessary -->
+    <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+</body>
+</html>

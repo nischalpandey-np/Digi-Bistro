@@ -4,15 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Summary</title>
-    <link rel="stylesheet" href="/static/styles1.css">
+    <link rel="stylesheet" href="/static/styles.css">
 </head>
 
 <body>
+    
+<header>
+    <div class="logo">DigiBistro</div>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="#about-us">About</a></li>
+            <li><a href="contactus.html">Contact</a></li>
+        </ul>
+    </nav>
+    
+</header>
     <section id="order-summary" class="order-summary-section">
         <div class="order-summary-container">
             <h2>Order Summary</h2>
             <p><strong>Customer Name:</strong> {{ customer_name }}</p>
             <p><strong>Phone Number:</strong> {{ phone_number }}</p>
+            <p><strong>Address:</strong>{{customer_address}}</p>
+            <p><strong>House Number:</strong>{{house_no}}</p>
 
             <h3>Order Details:</h3>
             <ul>
@@ -25,7 +39,7 @@
     </section>
     <form id="menu-form" action="{{ url_for('index') }}" method="get">
         <div class="order-btn-container">
-            <button type="submit" class="cta order-btn">Home</button>
+            <button type="submit" class="cta order-btn">Done</button>
         </div>
     </form>
 </body>

@@ -14,7 +14,7 @@ DB_CONFIG = {
     "host": os.getenv('DB_HOST', 'localhost'),
     "user": os.getenv('DB_USER', 'root'),
     "password": os.getenv('DB_PASSWORD', ''),
-    "database": os.getenv('DB_NAME', 'gourmetBistro_db')
+    "database": os.getenv('DB_NAME', '')
 }
 
 # Utility function to connect to the database
@@ -43,10 +43,11 @@ def create_tables(cursor):
                         item_total DECIMAL(10,2),
                         FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE)''')
 
-# Function to insert the order into the database
+# Function to save the order into the database
 def save_order_to_db(customer_name, phone_number, total_price, order_details):
     conn = get_db_connection()
     if not conn:
+        logger.error("Failed to connect to the database.")
         return None
 
     cursor = conn.cursor()
@@ -65,10 +66,11 @@ def save_order_to_db(customer_name, phone_number, total_price, order_details):
                             VALUES (%s, %s, %s, %s)''', (order_id, item, details["quantity"], details["item_total"]))
 
         conn.commit()
+        logger.info(f"Order ID {order_id} saved successfully.")
         return order_id
     except mysql.connector.Error as err:
         conn.rollback()
-        logger.error(f"Database error: {err}")
+        logger.error(f"Database error while saving order: {err}")
         return None
     finally:
         cursor.close()
