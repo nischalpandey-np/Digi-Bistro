@@ -1,59 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
-    <link rel="stylesheet" href="/static/styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gourmet Bistro - Home</title>
+  <link rel="stylesheet" href="/static/styles.css">
 </head>
-
 <body>
-
-<header>
-    
-    <div class="logo">
-        <img src="logo.jpg" alt="DigiBistro" >
-    </div>
+  <header>
+    <div class="logo">DIGI-Bistro</div>
     <nav>
-        <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="#about-us">About</a></li>
-            <li><a href="contactus.html">Contact</a></li>
-            <li><a href="auth/login.html">Login/signup</a></li>
-        </ul>
+      <ul>
+        <li><a href="{{ url_for('index') }}">Home</a></li>
+        <li><a href="#featured-items">Featured Items</a></li>
+        {% if session.user_id %}
+          <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
+        {% else %}
+          <li><a href="{{ url_for('auth.login') }}" class="cta">Login/Register</a></li>
+        {% endif %}
+      </ul>
     </nav>
-    
-</header>
-
-<section class="hero">
+  </header>
+  <section class="hero">
     <div class="hero-content">
-        <h1>Bite into Happiness at DigiBistro</h1>
-        <p>🔥Every Bite, Pure Delight</p>
-        <a href="viewMenu.html" class="cta">View Menu</a>
+      <h1>Welcome to Digi-Bistro</h1>
+      <p>Indulge in the finest culinary delights.</p>
+      <a href="{{ url_for('view_menu') }}" class="cta">Order Now</a>
     </div>
-</section>
-
-<section class="about-us" section id="about-us">
-    <div class="about-us-content">
-        <div class="about-us-text">
-            <h2>About DigiBistro</h2>
-            <p>Welcome to <strong>DigiBistro</strong>—where gourmet dining meets the convenience of online ordering. We are committed to bringing restaurant-quality meals straight to your home, crafted with the freshest ingredients and a passion for flavor.</p>
-            
-            <h3>Our Commitment to You</h3>
-            <ul>
-                <li><strong>Quality at Its Core:</strong> We carefully source premium ingredients to ensure every dish is a delight to your senses.</li>
-                <li><strong>Seamless Online Experience:</strong> Our user-friendly platform makes browsing, ordering, and enjoying your favorite meals effortless.</li>
-                <li><strong>Exceptional Service:</strong> From placing your order to timely delivery, we prioritize your satisfaction at every step.</li>
-            </ul>
-
-            <h3>Why Choose DigiBistro?</h3>
-            <p>Whether you're celebrating a special occasion or enjoying a cozy night in, <strong>DigiBistro</strong> transforms everyday dining into an extraordinary experience. Indulge in gourmet meals, hassle-free, all from the comfort of your home.</p>
+  </section>
+  <section class="featured-items">
+    <section id="featured-items">
+    <h2>Featured Dishes</h2>
+    <div class="item-list">
+        <div class="item-card">
+          <img src="/static/pasta.jpg" alt="Pasta">
+          <h3>Pasta</h3>
+          <p>A delicious pasta dish with rich tomato sauce and fresh herbs.</p>
+          <p class="price">Nrs-120.00</p>
         </div>
-        <div class="about-us-image">
-            <img src="/static/about-image.jpg" alt="About DigiBistro">
+        <div class="item-card">
+          <img src="/static/momo.jpg" alt="Momo">
+          <h3>Momo</h3>
+          <p>Steamed dumplings filled with flavorful meat or vegetables.</p>
+          <p class="price">Nrs-150.00</p>
         </div>
-    </div>
-</section>
-
+        <div class="item-card">
+          <img src="/static/burger.jpg" alt="Burger">
+          <h3>Burger</h3>
+          <p>Juicy burger with your choice of toppings, served with a side of fries.</p>
+          <p class="price">Nrs-220.00</p>
+        </div>
+        <div class="item-card">
+          <img src="/static/coffee.jpg" alt="Coffee">
+          <h3>Coffee</h3>
+          <p>Freshly brewed coffee to start your day right.</p>
+          <p class="price">Nrs-200.00</p>
+        </div>
+        <div class="item-card">
+          <img src="/static/tea.jpg" alt="Tea">
+          <h3>Tea</h3>
+          <p>A selection of soothing teas to relax and refresh.</p>
+          <p class="price">Nrs-32.00</p>
+      
+        </div>
+        <div class="item-card">
+          <img src="/static/chowmein.jpg" alt="Chowmein">
+          <h3>Chowmein</h3>
+          <p>Flavorful stir-fried noodles with vegetables and your choice of protein.</p>
+          <p class="price">Nrs-200.00</p>
+         
+        </div>
+        <div class="item-card">
+          <img src="/static/samosa.jpg" alt="Samosa">
+          <h3>Samosa</h3>
+          <p>Crispy pastry filled with spiced potatoes and peas.</p>
+          <p class="price">Nrs-35.00</p>
+        </div>
+      </div>
+    </section>
+  </section>
+  <footer class="footer">
+    <p>© 2025 Gourmet Bistro. All rights reserved.</p>
+  </footer>
 </body>
 </html>

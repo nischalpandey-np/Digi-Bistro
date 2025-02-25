@@ -1,92 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menu</title>
-    <link rel="stylesheet" href="/static/styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menu - Gourmet Bistro</title>
+  <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-    <section class="featured-items">
-        <div class="container">
-            <h2>Featured Items</h2>
-            <form id="menu-form" action="order.html" method="post">
-                <div class="item-list">
-                    <!-- Item Cards -->
-                    <div class="item-card">
-                        <img src="/static/pasta.jpg" alt="Pasta">
-                        <h3>Pasta</h3>
-                        <p>A delicious pasta dish with rich tomato sauce and fresh herbs.</p>
-                        <p class="price">Nrs-120.00</p>
-                        <button type="button" data-item="Pasta" class="add-to-cart">Add to Cart</button>
-                        <input type="number" name="Pasta" min="0" placeholder="Quantity" class="quantity-input" disabled>
-                    </div>
-                    <div class="item-card">
-                        <img src="/static/momo.jpg" alt="Momo">
-                        <h3>Momo</h3>
-                        <p>Steamed dumplings filled with flavorful meat or vegetables.</p>
-                        <p class="price">Nrs-150.00</p>
-                        <button type="button" data-item="Momo" class="add-to-cart">Add to Cart</button>
-                        <input type="number" name="Momo" min="0" placeholder="Quantity" class="quantity-input" disabled>
-                    </div>
-                    <div class="item-card">
-                        <img src="/static/burger.jpg" alt="Burger">
-                        <h3>Burger</h3>
-                        <p>Juicy burger with your choice of toppings, served with a side of fries.</p>
-                        <p class="price">Nrs-220.00</p>
-                        <button type="button" data-item="Burger" class="add-to-cart">Add to Cart</button>
-                        <input type="number" name="Burger" min="0" placeholder="Quantity" class="quantity-input" disabled>
-                    </div>
-                    <div class="item-card">
-                        <img src="/static/coffee.jpg" alt="Coffee">
-                        <h3>Coffee</h3>
-                        <p>Freshly brewed coffee to start your day right.</p>
-                        <p class="price">Nrs-200.00</p>
-                        <button type="button" data-item="Coffee" class="add-to-cart">Add to Cart</button>
-                        <input type="number" name="Coffee" min="0" placeholder="Quantity" class="quantity-input" disabled>
-                    </div>
-                    <div class="item-card">
-                        <img src="/static/tea.jpg" alt="Tea">
-                        <h3>Tea</h3>
-                        <p>A selection of soothing teas to relax and refresh.</p>
-                        <p class="price">Nrs-32.00</p>
-                        <button type="button" data-item="Tea" class="add-to-cart">Add to Cart</button>
-                        <input type="number" name="Tea" min="0" placeholder="Quantity" class="quantity-input" disabled>
-                    </div>
-                    <div class="item-card">
-                        <img src="/static/chowmein.jpg" alt="Chowmein">
-                        <h3>Chowmein</h3>
-                        <p>Flavorful stir-fried noodles with vegetables and your choice of protein.</p>
-                        <p class="price">Nrs-200.00</p>
-                        <button type="button" data-item="Chowmein" class="add-to-cart">Add to Cart</button>
-                        <input type="number" name="Chowmein" min="0" placeholder="Quantity" class="quantity-input" disabled>
-                    </div>
-                    <div class="item-card">
-                        <img src="/static/samosa.jpg" alt="Samosa">
-                        <h3>Samosa</h3>
-                        <p>Crispy pastry filled with spiced potatoes and peas.</p>
-                        <p class="price">Nrs-35.00</p>
-                        <button type="button" data-item="Samosa" class="add-to-cart">Add to Cart</button>
-                        <input type="number" name="Samosa" min="0" placeholder="Quantity" class="quantity-input" disabled>
-                    </div>
-                </div>
-                <div class="order-btn-container">
-                    {% if 'user' in session %}
-                        <!-- If the user is logged in, show the Place Order button -->
-                        <button type="submit" class="cta order-btn">Place Order</button>
-                    {% else %}
-                        <!-- If the user is not logged in, show the login link -->
-                        <a href="{{ url_for('auth.login_page', next=url_for('order')) }}" class="cta">Login to place order</a>
-                    {% endif %}
-                </div>
-                
-            </form>
+  <header>
+    <div class="logo">Gourmet Bistro</div>
+    <nav>
+      <ul>
+        <li><a href="{{ url_for('index') }}">Home</a></li>
+        <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
+      </ul>
+    </nav>
+  </header>
+  <section class="featured-items">
+    <div class="container">
+      <h2>Featured Items</h2>
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          {% for message in messages %}
+            <p style="color: #ff6b6b;">{{ message }}</p>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+      <form id="menu-form" action="{{ url_for('view_menu') }}" method="post">
+        <input type="hidden" id="items" name="items">
+        <div class="item-list">
+          <div class="item-card">
+            <img src="/static/pasta.jpg" alt="Pasta">
+            <h3>Pasta</h3>
+            <p>A delicious pasta dish with rich tomato sauce and fresh herbs.</p>
+            <p class="price">Nrs-120.00</p>
+            <button type="button" data-item="Pasta" class="add-to-cart">Add to Cart</button>
+            <input type="number" name="Pasta" min="0" placeholder="Quantity" value="0" class="quantity-input">
+          </div>
+          <div class="item-card">
+            <img src="/static/momo.jpg" alt="Momo">
+            <h3>Momo</h3>
+            <p>Steamed dumplings filled with flavorful meat or vegetables.</p>
+            <p class="price">Nrs-150.00</p>
+            <button type="button" data-item="Momo" class="add-to-cart">Add to Cart</button>
+            <input type="number" name="Momo" min="0" placeholder="Quantity" value="0" class="quantity-input">
+          </div>
+          <div class="item-card">
+            <img src="/static/burger.jpg" alt="Burger">
+            <h3>Burger</h3>
+            <p>Juicy burger with your choice of toppings, served with a side of fries.</p>
+            <p class="price">Nrs-220.00</p>
+            <button type="button" data-item="Burger" class="add-to-cart">Add to Cart</button>
+            <input type="number" name="Burger" min="0" placeholder="Quantity" value="0" class="quantity-input">
+          </div>
+          <div class="item-card">
+            <img src="/static/coffee.jpg" alt="Coffee">
+            <h3>Coffee</h3>
+            <p>Freshly brewed coffee to start your day right.</p>
+            <p class="price">Nrs-200.00</p>
+            <button type="button" data-item="Coffee" class="add-to-cart">Add to Cart</button>
+            <input type="number" name="Coffee" min="0" placeholder="Quantity" value="0" class="quantity-input">
+          </div>
+          <div class="item-card">
+            <img src="/static/tea.jpg" alt="Tea">
+            <h3>Tea</h3>
+            <p>A selection of soothing teas to relax and refresh.</p>
+            <p class="price">Nrs-32.00</p>
+            <button type="button" data-item="Tea" class="add-to-cart">Add to Cart</button>
+            <input type="number" name="Tea" min="0" placeholder="Quantity" value="0" class="quantity-input">
+          </div>
+          <div class="item-card">
+            <img src="/static/chowmein.jpg" alt="Chowmein">
+            <h3>Chowmein</h3>
+            <p>Flavorful stir-fried noodles with vegetables and your choice of protein.</p>
+            <p class="price">Nrs-200.00</p>
+            <button type="button" data-item="Chowmein" class="add-to-cart">Add to Cart</button>
+            <input type="number" name="Chowmein" min="0" placeholder="Quantity" value="0" class="quantity-input">
+          </div>
+          <div class="item-card">
+            <img src="/static/samosa.jpg" alt="Samosa">
+            <h3>Samosa</h3>
+            <p>Crispy pastry filled with spiced potatoes and peas.</p>
+            <p class="price">Nrs-35.00</p>
+            <button type="button" data-item="Samosa" class="add-to-cart">Add to Cart</button>
+            <input type="number" name="Samosa" min="0" placeholder="Quantity" value="0" class="quantity-input">
+          </div>
         </div>
-    </section>
-   
-</div>
-</section>
-    <script src="/static/script.js"></script>
+        <div class="order-btn-container">
+          <button type="submit" class="order-btn">Place Order</button>
+        </div>
+      </form>
+    </div>
+  </section>
+  <script src="/static/script.js"></script>
 </body>
 </html>
-               

@@ -1,25 +1,22 @@
 from flask import Flask, render_template, redirect, url_for, flash, request, session
 import logging
-import json  # Import JSON for proper decoding of item data
-from database import save_order_to_db  # Ensure this module exists and implements order saving
+import json
+from database import save_order_to_db, get_db_connection
 from dotenv import load_dotenv
 import os
-from auth import auth_bp, get_db_connection  # Import the auth blueprint and DB connection helper
+from auth import auth_bp
+from functools import wraps
 
-# Load environment variables from .env file
 load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.getenv('SECRET_KEY', 'default_secret_key')  # Fallback secret key if not set
+app.secret_key = os.getenv('SECRET_KEY', 'default_secret_key')
 
-# Register the authentication blueprint with URL prefix /auth
 app.register_blueprint(auth_bp, url_prefix='/auth')
 
-# Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Define item prices
 ITEM_PRICES = {
     "Pasta": 120.00,
     "Chi-Momo": 160.00,
@@ -31,10 +28,10 @@ ITEM_PRICES = {
     "Keema Noodles": 190.00,
     "Laphing": 120.00,
     "Corn Dog": 220.00,
-    "Sauces": 330.00
+    "Sauces": 330.00,
+    "Momo": 150.00
 }
 
-# Utility function to format currency
 def format_currency(value):
     return f"Nrs: {value:,.2f}"
 
@@ -42,7 +39,15 @@ def format_currency(value):
 def format_currency_filter(value):
     return format_currency(value)
 
-# Context processor to inject 'user' into all templates
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            flash("Please log in to access this page.", "error")
+            return redirect(url_for('auth.login', next=request.url))
+        return f(*args, **kwargs)
+    return decorated_function
+
 @app.context_processor
 def inject_user():
     user = None
@@ -59,7 +64,6 @@ def inject_user():
             logger.error(f"Error fetching user from DB: {e}", exc_info=True)
     return dict(user=user)
 
-# Routes for static pages
 @app.route('/')
 @app.route('/index.html')
 def index():
@@ -73,12 +77,29 @@ def contactUs():
 def aboutus():
     return render_template('aboutus.html')
 
-@app.route('/viewMenu.html')
+@app.route('/viewMenu.html', methods=['GET', 'POST'])
+@login_required  # Added login requirement
 def view_menu():
+    if request.method == 'POST':
+        items = {}
+        for item in ITEM_PRICES:
+            qty = request.form.get(item, 0)
+            try:
+                qty = int(qty)
+                if qty > 0:
+                    items[item] = qty
+            except ValueError:
+                flash(f"Invalid quantity for {item}.", "error")
+                return redirect(url_for('view_menu'))
+        if not items:
+            flash("Please select at least one item!", "error")
+            return redirect(url_for('view_menu'))
+        total_price = sum(ITEM_PRICES[item] * qty for item, qty in items.items())
+        return render_template('order.html', items=items, total_price=total_price, ITEM_PRICES=ITEM_PRICES)
     return render_template('viewMenu.html')
 
-# Order page route
 @app.route('/order.html', methods=['GET', 'POST'])
+@login_required
 def order():
     if request.method == 'POST':
         customer_name = request.form.get('customer-name', '').strip()
@@ -86,48 +107,46 @@ def order():
         customer_address = request.form.get('customer-address', '').strip()
         house_no = request.form.get('house-no', '').strip()
         items_raw = request.form.get('items', '').strip()
+        user_id = session.get('user_id')
 
-        # Validate required fields
         if not all([customer_name, phone_number, customer_address, items_raw]):
             flash("Please fill in all required fields.", "error")
-            return redirect(url_for('order'))
+            return redirect(url_for('view_menu'))
 
-        # Parse and validate items as JSON
         try:
-            items = json.loads(items_raw)  # Convert JSON string to dictionary
+            items = json.loads(items_raw)
             if not isinstance(items, dict):
                 raise ValueError("Invalid items format")
-
             order_details = {}
             total_price = 0
-
             for item_name, quantity in items.items():
-                quantity = int(quantity)  # Ensure it's an integer
+                quantity = int(quantity)
                 if quantity <= 0:
                     continue
-
                 if item_name not in ITEM_PRICES:
                     flash(f"Item '{item_name}' is not available.", "error")
-                    return redirect(url_for('order'))
-
+                    return redirect(url_for('view_menu'))
                 item_price = ITEM_PRICES[item_name]
                 item_total = item_price * quantity
                 order_details[item_name] = {'quantity': quantity, 'item_total': item_total}
                 total_price += item_total
+        except json.JSONDecodeError as e:
+            flash("Invalid item data format. Please try again.", "error")
+            logger.error(f"JSON decode error: {e}")
+            return redirect(url_for('view_menu'))
+        except ValueError as e:
+            flash(str(e), "error")
+            return redirect(url_for('view_menu'))
 
-        except (json.JSONDecodeError, ValueError) as e:
-            flash("Invalid item data received. Please try again.", "error")
-            return redirect(url_for('order'))
-
-        # Save order to database
         try:
-            order_id = save_order_to_db(customer_name, phone_number, total_price, order_details)
+            order_id = save_order_to_db(customer_name, phone_number, customer_address, order_details, total_price, user_id)
             if not order_id:
                 flash("Failed to save order. Please try again.", "error")
-                return redirect(url_for('order'))
+                return redirect(url_for('view_menu'))
         except Exception as e:
             flash("An error occurred while saving your order. Please try again.", "error")
-            return redirect(url_for('order'))
+            logger.error(f"Database save error: {e}", exc_info=True)
+            return redirect(url_for('view_menu'))
 
         return render_template('order_summary.html',
                                customer_name=customer_name,
@@ -136,12 +155,8 @@ def order():
                                phone_number=phone_number,
                                order_details=order_details,
                                total_price=total_price)
-
-    return render_template('order.html')
+    
+    return redirect(url_for('view_menu'))
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-
-
-    

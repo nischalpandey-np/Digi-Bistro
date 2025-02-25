@@ -1,46 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Summary</title>
-    <link rel="stylesheet" href="/static/styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Summary - Gourmet Bistro</title>
+  <link rel="stylesheet" href="/static/styles.css">
 </head>
-
 <body>
-    
-<header>
-    <div class="logo">DigiBistro</div>
+  <header>
+    <div class="logo">Gourmet Bistro</div>
     <nav>
-        <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="#about-us">About</a></li>
-            <li><a href="contactus.html">Contact</a></li>
-        </ul>
+      <ul>
+        <li><a href="{{ url_for('index') }}">Home</a></li>
+        <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
+      </ul>
     </nav>
-    
-</header>
-    <section id="order-summary" class="order-summary-section">
-        <div class="order-summary-container">
-            <h2>Order Summary</h2>
-            <p><strong>Customer Name:</strong> {{ customer_name }}</p>
-            <p><strong>Phone Number:</strong> {{ phone_number }}</p>
-            <p><strong>Address:</strong>{{customer_address}}</p>
-            <p><strong>House Number:</strong>{{house_no}}</p>
-
-            <h3>Order Details:</h3>
-            <ul>
-                {% for item, details in order_details.items() %}
-                    <li>{{ item }} - Quantity: {{ details.quantity }} - Total: {{ details.item_total | format_currency }}</li>
-                {% endfor %}
-            </ul>
-            <p><strong>Total Price:</strong> {{ total_price | format_currency }}</p>
-        </div>
-    </section>
-    <form id="menu-form" action="{{ url_for('index') }}" method="get">
-        <div class="order-btn-container">
-            <button type="submit" class="cta order-btn">Done</button>
-        </div>
-    </form>
+  </header>
+  <section class="order-summary-section">
+    <div class="order-summary-container">
+      <h2>Order Summary</h2>
+      <p><strong>Name:</strong> {{ customer_name }}</p>
+      <p><strong>Phone:</strong> {{ phone_number }}</p>
+      <p><strong>Address:</strong> {{ customer_address }}</p>
+      <p><strong>House Number:</strong> {{ house_no }}</p>
+      <h3>Order Details:</h3>
+      <ul>
+        {% for item, details in order_details.items() %}
+          <li>{{ item }} - Qty: {{ details.quantity }} - Total: Nrs {{ details.item_total | round(2) }}</li>
+        {% endfor %}
+      </ul>
+      <p><strong>Total: Nrs {{ total_price | round(2) }}</strong></p>
+      <div class="order-message">Thank you for your order!</div>
+    </div>
+  </section>
+  <footer class="footer">
+    <p>© 2025 Gourmet Bistro. All rights reserved.</p>
+  </footer>
 </body>
 </html>
