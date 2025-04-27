@@ -47,7 +47,7 @@ Digi-Bistro/
 ### 1️⃣ Clone the Repository
 ```sh
 git clone https://github.com/YOUR_USERNAME/Digi-Bistro.git
-cd gourmet_bistro
+cd Digi-Bistro
 ```
 
 ### 2️⃣ Create a Virtual Environment
