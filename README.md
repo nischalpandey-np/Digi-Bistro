@@ -46,7 +46,7 @@ Digi-Bistro/
 ## 🛠️ Setup & Installation
 ### 1️⃣ Clone the Repository
 ```sh
-git clone https://github.com/YOUR_USERNAME/gourmet_bistro.git
+git clone https://github.com/YOUR_USERNAME/Digi-Bistro.git
 cd gourmet_bistro
 ```
 
